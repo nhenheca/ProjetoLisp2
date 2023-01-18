@@ -2,7 +2,8 @@
 
 ;;;Retorna um tabuleiro 3x3 (3 arcos na vertical por 3 arcos na horizontal) Profundidade Heuristica Pai"
 (defun no-teste ()
- (list (tabuleiro-teste) 0 (heuristica (list (tabuleiro-teste) 0 0 nil) (get-objective)) nil)
+ ;(list (tabuleiro-teste) 0 (heuristica (list (tabuleiro-teste) 0 0 nil) (get-objective)) nil)
+ (list (tabuleiro-teste) 0 0 nil)
 )
 
 ;;;#########################################################################################################
@@ -65,15 +66,15 @@
  (list tabuleiro g h pai)
 )
 
-(defun novo-sucessor (pai op)
+(defun novo-sucessor (pai op peca)
  (cond
   ((equal nil (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai))) nil)
-  (t (cria-no (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai)) (+ 1 (no-profundidade pai)) (heuristica (list (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai))) (get-objective))  pai))
+  (t (cria-no (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai) peca) (+ 1 (no-profundidade pai)) 0 pai))
  )
 )
 
-(defun sucessores (no opsList)
- (remove nil (mapcar #'(lambda (op) (novo-sucessor no op)) opsList))
+(defun sucessores (no opsList peca)
+ (remove nil (mapcar #'(lambda (op) (novo-sucessor no op peca)) opsList))
 )
 
 ;;;#########################################################################################################
@@ -86,14 +87,25 @@
 
 ;;; Tabuleiro
 (defun tabuleiro-teste ()
- (get-tabuleiro)
-)
-
-(defun no-objetivop (no objetivo &optional (cl (length (car (no-estado no)))))
- (cond
-  ((equal objetivo (nCaixasFechadas no cl)) T)
-  (t nil)
+'(
+ (;arcos horizontais
+ (0 0 0 0 0 0) 
+ (0 0 0 0 0 0) 
+ (0 0 2 0 0 0) 
+ (0 0 0 0 0 0) 
+ (0 0 0 0 0 0) 
+ (0 0 0 0 0 0) 
+ ) 
+ (;arcos verticais
+ (0 0 0 0 0) 
+ (0 0 1 0 0) 
+ (0 0 1 0 0) 
+ (0 0 0 0 0) 
+ (0 0 0 0 0) 
+ (0 0 0 0 0) 
+ (0 0 0 0 0) 
  )
+)
 )
 
 ;;; AUXILIARES ;;;
@@ -148,12 +160,26 @@
 )
 
 ;;;Devolve a lista de operadores
-(defun operadores (cl &optional (pos 1) (i 1))
+(defun operadoresC (&optional (c 7) (l 6) (cc 1) (ll 1))
  (cond
-  ((equal pos (+ 1 cl)) nil)
-  ((not (equal cl i)) (append (list(list 'arco-vertical pos i '(get-arcos-horizontais ))) (list(list 'arco-horizontal pos i '(get-arcos-verticais ))) (operadores cl pos (+ i 1))) )
-  ((equal cl i) (operadores cl (1+ pos) 1))
+  ((and (equal cc c)(equal ll l)) nil)
+
+  ((not (equal c cc)) (append (list(list 'arco-horizontal ll cc '(get-arcos-verticais ))) (operadoresC c l (+ cc 1) ll)))
+  ((equal c cc) (operadoresC c l 1 (+ 1 ll)))
  )
+)
+
+(defun operadoresL (&optional (c 7) (l 6) (cc 1) (ll 1))
+ (cond
+  ((and (equal cc c)(equal ll l)) nil)
+
+  ((not (equal l ll)) (append (list(list 'arco-vertical cc ll '(get-arcos-horizontais ))) (operadoresL c l cc (+ 1 ll))))
+  ((equal l ll) (operadoresL c l (+ 1 cc) 1 ))
+ )
+)
+
+(defun operadores ()
+ (append (operadoresC) (operadoresL))
 )
 
 ;;;#########################################################################################################
@@ -174,26 +200,64 @@
  )
 )
 
-;;(get-arco-na-posicao 2 3 (get-arcos-horizontais (no-teste)))
-(defun bom-vizinho (no &optional (cl (length (car (no-estado no)))) (iL 1)(posL 1)(iC 1)(posC 1)(itNumber 1)(c0 0)(c1 0)(c2 0)(c3 0)(c4 0))
- (cond
-  ((equal itNumber cl) (+ (* 4 c0)(* 3 c1)(* 2 c2)(* 1 c3)(* 0 c4)))
-  ((equal cl posC) (bom-vizinho no cl 1 (+ posL 1) (+ iC 1) 1 (+ itNumber 1) c0 c1 c2 c3 c4))
-  ((equal 0 (+ (get-arco-na-posicao posL iL (get-arcos-horizontais no))(get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no))(get-arco-na-posicao posC iC (get-arcos-verticais no))(get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (bom-vizinho no cl (+ iL 1) posL iC (+ posC 1) itNumber (1+ c0) c1 c2 c3 c4))
-  ((equal 1 (+ (get-arco-na-posicao posL iL (get-arcos-horizontais no))(get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no))(get-arco-na-posicao posC iC (get-arcos-verticais no))(get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (bom-vizinho no cl (+ iL 1) posL iC (+ posC 1) itNumber c0 (1+ c1) c2 c3 c4))
-  ((equal 2 (+ (get-arco-na-posicao posL iL (get-arcos-horizontais no))(get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no))(get-arco-na-posicao posC iC (get-arcos-verticais no))(get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (bom-vizinho no cl (+ iL 1) posL iC (+ posC 1) itNumber c0 c1 (1+ c2) c3 c4))
-  ((equal 3 (+ (get-arco-na-posicao posL iL (get-arcos-horizontais no))(get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no))(get-arco-na-posicao posC iC (get-arcos-verticais no))(get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (bom-vizinho no cl (+ iL 1) posL iC (+ posC 1) itNumber c0 c1 c2 (1+ c3) c4))
-  ((equal 4 (+ (get-arco-na-posicao posL iL (get-arcos-horizontais no))(get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no))(get-arco-na-posicao posC iC (get-arcos-verticais no))(get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (bom-vizinho no cl (+ iL 1) posL iC (+ posC 1) itNumber c0 c1 c2 c3 (1+ c4)))
- )
-)
-
-(defun heuristica (no &optional objective)
- (cond
-  ((equal (get-heuristicaop) 1) (- objective (nCaixasFechadas no)))
-  ((equal (get-heuristicaop) 2) (bom-vizinho no))
- )
-)
-
 ;;;#########################################################################################################
 ;;; HEURISTICA E AUXILIARES ################################################################################
+;;;#########################################################################################################
+
+;;;#########################################################################################################
+;;; FASE 2 AUXILIARES ######################################################################################
+;;;#########################################################################################################
+
+(defun tabuleiro-preenchidop (node)
+ (cond
+  ((and (null (remove nil (mapcar #'(lambda (x) (member 0 x)) (car (no-estado node))))) (null (remove nil (mapcar #'(lambda (x) (member 0 x)) (car (cdr (no-estado node))))))) t)
+  (t nil)
+ )
+)
+
+(defun avaliar-no (tipo node &optional (l 1) (c 1) listaGlobal listaLocal paths)
+ (cond
+  ((and (equal nil (existe-em-listap l c listaLocal))(equal nil (existe-em-listap l c listaGlobal))(no-valido-para-dorap node l c)) 
+  (cond
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+  ))
+  (t (avaliar-no tipo node 1 1 listaGlobal nil (+ (is-path-big listaLocal) paths))
+ )
+)
+
+(defun existe-em-listap (l c lista)
+ (cond
+  ((null lista) nil)
+  ((and (equal l (first (car lista))) (equal c (second (car lista)))) t)
+  (t (existe-em-listap l c (cdr lista)))
+ )
+)
+
+(defun is-path-big (lista)
+ (cond
+  ((> (length lista) 2) 1)
+  (t 0)
+ )
+)
+
+(defun no-valido-para-dorap (node l c)
+ (cond
+  ((and (equal l 1)(equal c 1) (or (equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao (+ 1 c) l (get-arcos-verticais node))))) t) 
+  ((and (equal l 1)(equal c 6) (or (equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao c l (get-arcos-verticais node))))) t) 
+  ((and (equal l 5)(equal c 1) (or (equal 0 (get-arco-na-posicao l c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao (+ 1 c) l (get-arcos-verticais node))))) t) 
+  ((and (equal l 5)(equal c 6) (or (equal 0 (get-arco-na-posicao l c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao c l (get-arcos-verticais node))))) t) 
+  ((equal l 1) t)
+  ((equal l 5) t)
+  ((equal c 1) t)
+  ((equal c 6) t)
+  (t )
+ )
+)
+
+
+;;;#########################################################################################################
+;;; FASE 2 AUXILIARES ######################################################################################
 ;;;#########################################################################################################
