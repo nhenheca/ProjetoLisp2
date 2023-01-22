@@ -216,7 +216,7 @@
 )
 
 (defun get-d ()
- 4
+ 5
 )
 
 (defun alfa-beta-eval (node)
