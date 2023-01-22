@@ -2,34 +2,35 @@
 ;;; ALFA BETA ##########################################################################################################################################################################################################################
 ;;; ####################################################################################################################################################################################################################################
 
-(defun alfa-beta(depth operadores &optional (node (no-teste)) (alfa (- 0 999)) (beta 999) (player 0))
- (cond
-  ((eq depth 0) (no-custo node))
-  ((eq player 0) (progn (setq value (- 0 999)) (alfa-beta-max (sucessores node operadores 2) depth operadores alfa beta)))
-  ((eq player 1) (progn (setq value 999) (alfa-beta-min (sucessores node operadores 2) depth operadores alfa beta)))
- )
-)
 
-(defun alfa-beta-max (childs depth operadores alfa beta)
+(defun alfa-beta (player &optional (node (no-teste)) (alfa (- 0 999)) (beta 999) (flag 0))
  (cond
-  ((null childs) value)
-  (t (progn (setq value (max value (alfa-beta (- depth 1) operadores (car childs) alfa beta 1))) 
+  ((eq (no-profundidade node) (get-d)) (alfa-beta-eval node))
+  (t
    (cond
-    ((> value beta) value)
-    (t (progn (setq alfa (max alfa value)) (alfa-beta-max (cdr childs) depth operadores alfa beta)))
-   ))
+    ((eq 0 flag) (alfa-beta-max player (sucessores node (operadores) player) alfa beta))
+    ((eq 1 flag) (alfa-beta-max player (sucessores node (operadores) (troca-jogador player)) alfa beta))
+   )
   )
  )
 )
 
-(defun alfa-beta-min (childs depth operadores alfa beta)
- (cond
-  ((null childs) value)
-  (t (progn (setq value (min value (alfa-beta (- depth 1) operadores (car childs) alfa beta 0))) 
-   (cond
-    ((< value alfa) value)
-    (t (progn (setq beta (min beta value)) (alfa-beta-min (cdr childs) depth operadores alfa beta)))
-   ))
+(defun alfa-beta-max (player sucessores alfa beta)
+ (let ((alfa (max alfa (alfa-beta player (car sucessores) alfa beta 1))))
+  (cond
+   ((>= alfa beta) beta)
+   ((eq 1 (length sucessores)) alfa)
+   (t (alfa-beta-max player (cdr sucessores) alfa beta))
+  )
+ )
+)
+
+(defun alfa-beta-min (player sucessores alfa beta)
+ (let ((beta (min beta (alfa-beta player (car sucessores) alfa beta 0))))
+  (cond
+   ((<= beta alfa) alfa)
+   ((eq 1 (length sucessores)) beta)
+   (t (alfa-beta-min player (cdr sucessores) alfa beta))
   )
  )
 )
