@@ -91,15 +91,15 @@
  (;arcos horizontais
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
- (0 0 0 0 0 0) 
+ (0 0 2 0 0 0) 
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
  ) 
  (;arcos verticais
  (0 0 0 0 0) 
- (0 0 0 0 0) 
- (0 0 0 0 0) 
+ (0 0 1 0 0) 
+ (0 0 1 0 0) 
  (0 0 0 0 0) 
  (0 0 0 0 0) 
  (0 0 0 0 0) 
@@ -187,24 +187,6 @@
 ;;;#########################################################################################################
 
 ;;;#########################################################################################################
-;;; HEURISTICA E AUXILIARES ################################################################################
-;;;#########################################################################################################
-
-;;(get-arco-na-posicao 2 3 (get-arcos-horizontais (no-teste)))
-(defun nCaixasFechadas (no &optional (cl (length (car (no-estado no)))) (iL 1)(posL 1)(iC 1)(posC 1)(caixas 0)(itNumber 1))
- (cond
-  ((equal itNumber cl) caixas)
-  ((equal cl posC) (nCaixasFechadas no cl 1 (+ posL 1) (+ iC 1) 1 caixas (+ itNumber 1)))
-  ((and (equal 1 (get-arco-na-posicao posL iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao posC iC (get-arcos-verticais no)))(equal 1 (get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (nCaixasFechadas no cl (+ iL 1) posL iC (+ posC 1)(+ caixas 1) itNumber))
-  ((not(and (equal 1 (get-arco-na-posicao posL iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao posC iC (get-arcos-verticais no)))(equal 1 (get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no))))) (nCaixasFechadas no cl (+ iL 1) posL iC (+ posC 1) caixas itNumber))
- )
-)
-
-;;;#########################################################################################################
-;;; HEURISTICA E AUXILIARES ################################################################################
-;;;#########################################################################################################
-
-;;;#########################################################################################################
 ;;; FASE 2 AUXILIARES ######################################################################################
 ;;;#########################################################################################################
 
@@ -215,20 +197,49 @@
  )
 )
 
-(defun get-d ()
- 4
-)
-
-(defun alfa-beta-eval (node)
- 1
-)
-
-(defun troca-jogador (player)
+(defun avaliar-no (tipo node &optional (l 1) (c 1) listaGlobal listaLocal paths)
  (cond
-  ((eq player 1) 2)
-  (t 1)
+  ((and (equal nil (existe-em-listap l c listaLocal))(equal nil (existe-em-listap l c listaGlobal))(no-valido-para-dorap node l c)) 
+  (cond
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+   ((equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node))) )
+  ))
+  (t (avaliar-no tipo node 1 1 listaGlobal nil (+ (is-path-big listaLocal) paths))
  )
 )
+
+(defun existe-em-listap (l c lista)
+ (cond
+  ((null lista) nil)
+  ((and (equal l (first (car lista))) (equal c (second (car lista)))) t)
+  (t (existe-em-listap l c (cdr lista)))
+ )
+)
+
+(defun is-path-big (lista)
+ (cond
+  ((> (length lista) 2) 1)
+  (t 0)
+ )
+)
+
+(defun no-valido-para-dorap (node l c)
+ (cond
+  ((and (equal l 1)(equal c 1) (or (equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao (+ 1 c) l (get-arcos-verticais node))))) t) 
+  ((and (equal l 1)(equal c 6) (or (equal 0 (get-arco-na-posicao (+ 1 l) c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao c l (get-arcos-verticais node))))) t) 
+  ((and (equal l 5)(equal c 1) (or (equal 0 (get-arco-na-posicao l c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao (+ 1 c) l (get-arcos-verticais node))))) t) 
+  ((and (equal l 5)(equal c 6) (or (equal 0 (get-arco-na-posicao l c (get-arcos-horizontais node)))(equal 0 (get-arco-na-posicao c l (get-arcos-verticais node))))) t) 
+  ((equal l 1) t)
+  ((equal l 5) t)
+  ((equal c 1) t)
+  ((equal c 6) t)
+  (t )
+ )
+)
+
+
 ;;;#########################################################################################################
 ;;; FASE 2 AUXILIARES ######################################################################################
 ;;;#########################################################################################################
