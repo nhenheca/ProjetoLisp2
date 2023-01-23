@@ -89,7 +89,7 @@
 (defun tabuleiro-teste ()
 '(
  (;arcos horizontais
- (1 0 0 0 0 0) 
+ (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 

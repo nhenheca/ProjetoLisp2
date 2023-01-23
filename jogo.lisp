@@ -1,55 +1,66 @@
-(defun jogada-humano (node)
+(defun jogada-humano (node player)
  (progn (imprimir-tabuleiro node)
  (cond 
   ((tabuleiro-preenchidop node) nil)
-  (t (get-horizontal-vertical node))
+  (t (get-horizontal-vertical node player))
  ))
 )
 
-(defun get-horizontal-vertical (node)
+(defun get-horizontal-vertical (node player)
  (format t "Inserir peÃ§a na: ~%")
  (format t "1 - Horizontal~%")
  (format t "2 - Vertical~%")
  (let ((op (read)))
   (cond
-   ((eq 1 op) (inserir-arco-horizontal node))
-   ((eq 2 op) (inserir-arco-vertical node))
+   ((eq 1 op) (inserir-arco-horizontal node player))
+   ((eq 2 op) (inserir-arco-vertical node player))
    (t nil)
   )
  )
 )
 
-(defun inserir-arco-horizontal (node)
+(defun inserir-arco-horizontal (node player)
  (format t "Digite a 'linha' e de seguida a 'coluna' pretendida. ~%")
  (let ((tabuleiro (arco-horizontal node (read) (read) (get-arcos-verticais node) 1)))
   (cond
-   ((null tabuleiro) (jogada-humano node))
+   ((null tabuleiro) (jogada-humano node player))
    (t (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))
-   (jogada-computador (list tabuleiro (+ 1 (no-profundidade node)) (heuristica (list tabuleiro 0 0 0)) (no-pai node)))))
+   (jogada-computador (list tabuleiro (+ 1 (no-profundidade node)) (heuristica (list tabuleiro 0 0 0)) (no-pai node)) player)))
   )
  )
 )
 
-(defun inserir-arco-vertical (node)
+(defun inserir-arco-vertical (node player)
  (format t "Digite a 'coluna' e de seguida a 'linha' pretendida. ~%")
  (let ((tabuleiro (arco-vertical node (read) (read) (get-arcos-horizontais node) 1)))
-  (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))
-  (jogada-computador (list tabuleiro (+ 1 (no-profundidade node)) (heuristica (list tabuleiro 0 0 0)) (no-pai node))))
+  (cond
+   ((null tabuleiro) (jogada-humano node player))
+   (t (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))
+   (jogada-computador (list tabuleiro (+ 1 (no-profundidade node)) (heuristica (list tabuleiro 0 0 0)) (no-pai node)) player)))
+  )
  )
 )
 
-(defun jogada-computador (node)
+(defun jogada-computador (node player)
  (cond 
   ((tabuleiro-preenchidop node) nil)
-  (t (jogada-humano (alfa-beta 2 node)))
+  (t (jogada-humano (alfa-beta player node) player))
  )
 )
 
 ;############################################################################
 
 (defun start1 ()
- (jogada-humano (no-teste))
+ (progn (format t "1 - Jogador 1 Humano | 2 - Jogador 1 Computador. ~%")
+ (let ((op (read)))
+  (cond
+   ((eq op 1) (jogada-humano (no-teste) 2))
+   ((eq op 2) (jogada-computador (no-teste) 1))
+   (t (start1))
+  )
+ ))
 )
+
 
 (defun start2 ()
  ;cpu vs cpu
