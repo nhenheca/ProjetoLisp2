@@ -205,7 +205,7 @@
 
 ;;;GET PROFUNDIDADE
 (defun get-d ()
- 1
+ 4
 )
 
 (defun alfa-beta-eval (node)

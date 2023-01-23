@@ -24,6 +24,24 @@
   )
  )
 )
+;;;############################################################################################################################
+(defun alfa-beta-max (player sucessores alfa beta)
+  (cond 
+   ((null sucessores) alfa)
+   (t (let* ((valor (alfa-beta player (car sucessores) alfa beta 0))(novo-alfa (max alfa valor)))
+        (if (>= novo-alfa beta)(progn beta)
+        (progn (setf *jogada* (car sucessores)) 
+            (max novo-alfa (alfa-beta-max player (cdr sucessores) novo-alfa beta))))))))
+
+(defun alfa-beta-min (player sucessores alfa beta)
+  (cond 
+   ((null sucessores) beta)
+   (t (let* ((valor (alfa-beta player (car sucessores) alfa beta 1))(novo-beta (min beta valor)))
+        (if (<= novo-beta alfa)(progn alfa)
+        (progn (setf *jogada* (car sucessores)) 
+            (min novo-beta (alfa-beta-min player (cdr sucessores) alfa novo-beta))))))))
+
+;;;############################################################################################################################
 
 (defun alfa-beta-min2 (player sucessores alfa beta)
  (let ((beta (min beta (alfa-beta player (car sucessores) alfa beta 0))))
@@ -34,45 +52,3 @@
   )
  )
 )
-
-;;;############################################################################################################################
-(defun alfa-beta-max (player sucessores alfa beta)
-  (cond 
-   ((null sucessores) alfa)
-   (t (let* ((valor (alfa-beta player (car sucessores) alfa beta 1))(novo-alfa (max alfa valor)))
-        (if (>= novo-alfa beta)(progn beta)
-        (progn (setf *jogada* (car sucessores)) 
-            (max novo-alfa (alfa-beta-max player (cdr sucessores) novo-alfa beta))))))))
-
-(defun alfa-beta-min (player sucessores alfa beta)
-  (cond 
-   ((null sucessores) beta)
-   (t (let* ((valor (alfa-beta player (car sucessores) alfa beta 0))(novo-beta (min beta valor)))
-        (if (<= novo-beta alfa)(progn alfa)
-        (progn (setf *jogada* (car sucessores)) 
-            (min novo-beta (alfa-beta-min player (cdr sucessores) alfa novo-beta))))))))
-
-;;;############################################################################################################################
-
-
-(defun alfa-beta-max (player sucessores alfa beta)
- (let ((novoalfa (max alfa (alfa-beta player (car sucessores) alfa beta 1))))
-  (cond
-   ((null sucessores) (progn (setq *jogada* (car sucessores)) novoalfa))
-   ((>= novoalfa beta) beta) 
-   (t (progn (setq *jogada* (car sucessores)) (alfa-beta-max player (cdr sucessores) novoalfa beta)))
-  )
- )
-)
-
-(defun alfa-beta-min (player sucessores alfa beta)
- (let ((novobeta (min beta (alfa-beta player (car sucessores) alfa beta 0))))
-  (cond
-   ((null sucessores) (progn (setq *jogada* (car sucessores)) novobeta))
-   ((<= novobeta alfa) alfa)
-   (t (progn (setq *jogada* (car sucessores)) (alfa-beta-min player (cdr sucessores) alfa novobeta)))
-  )
- )
-)
-
-;;;############################################################################################################################
