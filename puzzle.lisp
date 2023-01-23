@@ -3,7 +3,7 @@
 ;;;Retorna um tabuleiro 3x3 (3 arcos na vertical por 3 arcos na horizontal) Profundidade Heuristica Pai"
 (defun no-teste ()
  ;(list (tabuleiro-teste) 0 (heuristica (list (tabuleiro-teste) 0 0 nil) (get-objective)) nil)
- (list (tabuleiro-teste) 0 0 nil)
+ (list (tabuleiro-teste) 0 (heuristica (list (tabuleiro-teste) 0 0 nil)) nil)
 )
 
 ;;;#########################################################################################################
@@ -69,7 +69,7 @@
 (defun novo-sucessor (pai op peca)
  (cond
   ((equal nil (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai))) nil)
-  (t (cria-no (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai) peca) (+ 1 (no-profundidade pai)) 0 pai))
+  (t (cria-no (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai) peca) (+ 1 (no-profundidade pai)) (heuristica (list (funcall (first op) pai (second op) (third op) (funcall (car (fourth op)) pai)))) pai))
  )
 )
 
@@ -190,19 +190,23 @@
 ;;; HEURISTICA E AUXILIARES ################################################################################
 ;;;#########################################################################################################
 
-;;(get-arco-na-posicao 2 3 (get-arcos-horizontais (no-teste)))
-(defun nCaixasFechadas (no &optional (cl (length (car (no-estado no)))) (iL 1)(posL 1)(iC 1)(posC 1)(caixas 0)(itNumber 1))
+(defun heuristica (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter 0))
  (cond
-  ((equal itNumber cl) caixas)
-  ((equal cl posC) (nCaixasFechadas no cl 1 (+ posL 1) (+ iC 1) 1 caixas (+ itNumber 1)))
-  ((and (equal 1 (get-arco-na-posicao posL iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao posC iC (get-arcos-verticais no)))(equal 1 (get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no)))) (nCaixasFechadas no cl (+ iL 1) posL iC (+ posC 1)(+ caixas 1) itNumber))
-  ((not(and (equal 1 (get-arco-na-posicao posL iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao (+ 1 posL) iL (get-arcos-horizontais no)))(equal 1 (get-arco-na-posicao posC iC (get-arcos-verticais no)))(equal 1 (get-arco-na-posicao (+ 1 posC) iC (get-arcos-verticais no))))) (nCaixasFechadas no cl (+ iL 1) posL iC (+ posC 1) caixas itNumber))
+  ((and (equal cc c)(equal ll l)) counter)
+  ((eq c cc) (heuristica node c l 1 (+ 1 ll) counter))
+  ((eq 3 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao cc ll (get-arcos-verticais node))
+                                 (get-arco-na-posicao (+ 1 cc) ll (get-arcos-verticais node)))))) 
+  (heuristica node c l (+ 1 cc) ll (+ 1 counter)))
+  (t (heuristica node c l (+ 1 cc) ll counter))
  )
 )
 
 ;;;#########################################################################################################
 ;;; HEURISTICA E AUXILIARES ################################################################################
 ;;;#########################################################################################################
+
 
 ;;;#########################################################################################################
 ;;; FASE 2 AUXILIARES ######################################################################################
