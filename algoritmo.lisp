@@ -19,8 +19,8 @@
  (let ((alfa (max alfa (alfa-beta player (car sucessores) alfa beta 1))))
   (cond
    ((>= alfa beta) beta)
-   ((eq 1 (length sucessores)) alfa)
-   (t (alfa-beta-max player (cdr sucessores) alfa beta))
+   ((eq 1 (length sucessores)) (progn (setq *jogada* (car sucessores)) alfa))
+   (t (progn (setq *jogada* (car sucessores)) (alfa-beta-max player (cdr sucessores) alfa beta)))
   )
  )
 )
@@ -29,8 +29,8 @@
  (let ((beta (min beta (alfa-beta player (car sucessores) alfa beta 0))))
   (cond
    ((<= beta alfa) alfa)
-   ((eq 1 (length sucessores)) beta)
-   (t (alfa-beta-min player (cdr sucessores) alfa beta))
+   ((eq 1 (length sucessores)) (progn (setq *jogada* (car sucessores)) beta))
+   (t (progn (setq *jogada* (car sucessores)) (alfa-beta-min player (cdr sucessores) alfa beta)))
   )
  )
 )

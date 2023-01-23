@@ -1,3 +1,5 @@
+(defvar *jogada* nil)
+
 (defun jogada-humano (node player)
  (progn (imprimir-tabuleiro node)
  (cond 
@@ -25,7 +27,7 @@
   (cond
    ((null tabuleiro) (jogada-humano node player))
    (t (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))
-   (jogada-computador (list tabuleiro (+ 1 (no-profundidade node)) (heuristica (list tabuleiro 0 0 0)) (no-pai node)) player)))
+   (jogada-computador (list tabuleiro 0 (heuristica (list tabuleiro 0 0 0)) (no-pai node)) player)))
   )
  )
 )
@@ -36,7 +38,7 @@
   (cond
    ((null tabuleiro) (jogada-humano node player))
    (t (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))
-   (jogada-computador (list tabuleiro (+ 1 (no-profundidade node)) (heuristica (list tabuleiro 0 0 0)) (no-pai node)) player)))
+   (jogada-computador (list tabuleiro 0 (heuristica (list tabuleiro 0 0 0)) (no-pai node)) player)))
   )
  )
 )
@@ -44,7 +46,8 @@
 (defun jogada-computador (node player)
  (cond 
   ((tabuleiro-preenchidop node) nil)
-  (t (jogada-humano (alfa-beta player node) player))
+  (t (progn (alfa-beta player node) (jogada-humano *jogada* player)))
+  ;(t (jogada-humano (alfa-beta player node) player))
  )
 )
 

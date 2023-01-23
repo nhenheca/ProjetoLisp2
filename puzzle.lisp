@@ -222,7 +222,7 @@
 
 ;;;GET PROFUNDIDADE
 (defun get-d ()
- 2
+ 3
 )
 
 (defun alfa-beta-eval (node)
