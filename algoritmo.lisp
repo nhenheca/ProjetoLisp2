@@ -8,8 +8,8 @@
   ((eq (no-profundidade node) (get-d)) (alfa-beta-eval node))
   (t
    (cond
-    ((eq 0 flag) (alfa-beta-max player (sucessores node (operadores) player) alfa beta))
-    ((eq 1 flag) (alfa-beta-max player (sucessores node (operadores) (troca-jogador player)) alfa beta))
+    ((eq 0 flag) (alfa-beta-max player (ordenar-sucessores (sucessores node (operadores) player)) alfa beta))
+    ((eq 1 flag) (alfa-beta-max player (ordenar-sucessores (sucessores node (operadores) (troca-jogador player))) alfa beta))
    )
   )
  )

@@ -89,7 +89,7 @@
 (defun tabuleiro-teste ()
 '(
  (;arcos horizontais
- (0 0 0 0 0 0) 
+ (1 0 0 0 0 0) 
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
  (0 0 0 0 0 0) 
@@ -192,7 +192,7 @@
 
 (defun heuristica (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter 0))
  (cond
-  ((and (equal cc c)(equal ll l)) counter)
+  ((and (equal cc c)(equal ll l)) (- 30 counter))
   ((eq c cc) (heuristica node c l 1 (+ 1 ll) counter))
   ((eq 3 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
                                  (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
@@ -212,6 +212,7 @@
 ;;; FASE 2 AUXILIARES ######################################################################################
 ;;;#########################################################################################################
 
+;;VERFICA SE O TABULEIRO ESTA CHEIO
 (defun tabuleiro-preenchidop (node)
  (cond
   ((and (null (remove nil (mapcar #'(lambda (x) (member 0 x)) (car (no-estado node))))) (null (remove nil (mapcar #'(lambda (x) (member 0 x)) (car (cdr (no-estado node))))))) t)
@@ -219,8 +220,9 @@
  )
 )
 
+;;;GET PROFUNDIDADE
 (defun get-d ()
- 5
+ 2
 )
 
 (defun alfa-beta-eval (node)
@@ -232,6 +234,10 @@
   ((eq player 1) 2)
   (t 1)
  )
+)
+
+(defun ordenar-sucessores (sucessores)
+ (sort sucessores #'< :key #'third)
 )
 
 ;;;#########################################################################################################
