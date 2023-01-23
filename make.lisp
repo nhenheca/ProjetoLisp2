@@ -1,0 +1,1 @@
+(load "jogo.lisp")(load "algoritmo.lisp")(load "puzzle.lisp")

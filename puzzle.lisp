@@ -144,7 +144,7 @@
 (defun arco-horizontal (no pos i l &optional (z 1))
  (cond
   ((equal nil (get-arco-na-posicao pos i (get-arcos-horizontais no))) nil)
-  ((= 1 (get-arco-na-posicao pos i (get-arcos-horizontais no))) nil)
+  ((/= 0 (get-arco-na-posicao pos i (get-arcos-horizontais no))) nil)
   (t (list (arco-na-posicao pos i (get-arcos-horizontais no) z)  l))
  )
 )
@@ -154,7 +154,7 @@
 (defun arco-vertical (no pos i l &optional (z 1))
  (cond
   ((equal nil (get-arco-na-posicao pos i (get-arcos-verticais no))) nil)
-  ((= 1 (get-arco-na-posicao pos i (get-arcos-verticais no))) nil)
+  ((/= 0 (get-arco-na-posicao pos i (get-arcos-verticais no))) nil)
   (t (list l (arco-na-posicao pos i (get-arcos-verticais no) z)))
  )
 )
