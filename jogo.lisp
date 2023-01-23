@@ -51,7 +51,15 @@
 ;############################################################################
 
 (defun start1 ()
- (progn (format t "1 - Jogador 1 Humano | 2 - Jogador 1 Computador. ~%")
+ (progn 
+ (format t "|----------------------------------------------| ~%")
+ (format t "|                                              | ~%")
+ (format t "|        Selecione o primeiro Jogador          | ~%")     
+ (format t "|                                              | ~%")
+ (format t "|                 1 - Humano                   | ~%")
+ (format t "|               2 - Computador                 | ~%")
+ (format t "|                                              | ~%")
+ (format t "|----------------------------------------------| ~%")
  (let ((op (read)))
   (cond
    ((eq op 1) (jogada-humano (no-teste) 2))
