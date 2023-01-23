@@ -15,7 +15,7 @@
  )
 )
 
-(defun alfa-beta-max2 (player sucessores alfa beta)
+(defun alfa-beta-max1 (player sucessores alfa beta)
  (let ((alfa (max alfa (alfa-beta player (car sucessores) alfa beta 1))))
   (cond
    ((>= alfa beta) beta)
@@ -25,7 +25,7 @@
  )
 )
 
-(defun alfa-beta-min2 (player sucessores alfa beta)
+(defun alfa-beta-min1 (player sucessores alfa beta)
  (let ((beta (min beta (alfa-beta player (car sucessores) alfa beta 0))))
   (cond
    ((<= beta alfa) alfa)
@@ -55,7 +55,7 @@
 ;;;############################################################################################################################
 
 
-(defun alfa-beta-max (player sucessores alfa beta)
+(defun alfa-beta-max1 (player sucessores alfa beta)
  (let ((novoalfa (max alfa (alfa-beta player (car sucessores) alfa beta 1))))
   (cond
    ((null sucessores) (progn (setq *jogada* (car sucessores)) novoalfa))
@@ -65,7 +65,7 @@
  )
 )
 
-(defun alfa-beta-min (player sucessores alfa beta)
+(defun alfa-beta-min1 (player sucessores alfa beta)
  (let ((novobeta (min beta (alfa-beta player (car sucessores) alfa beta 0))))
   (cond
    ((null sucessores) (progn (setq *jogada* (car sucessores)) novobeta))

@@ -208,8 +208,22 @@
  1
 )
 
-(defun alfa-beta-eval (node)
- 1
+(defun alfa-beta-eval (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter3 0) (counter4 0))
+ (cond
+  ((and (equal cc c)(equal ll l)) (+ (- (* 10 counter4) (* 10 (caixas-fechadas (no-pai node)))) (* -10 counter3)))
+  ((eq c cc) (alfa-beta-eval node c l 1 (+ 1 ll) counter3 counter4))
+  ((eq 3 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao cc ll (get-arcos-verticais node))
+                                 (get-arco-na-posicao (+ 1 cc) ll (get-arcos-verticais node)))))) 
+  (alfa-beta-eval node c l (+ 1 cc) ll (+ 1 counter3) counter4))
+  ((eq 4 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao cc ll (get-arcos-verticais node))
+                                 (get-arco-na-posicao (+ 1 cc) ll (get-arcos-verticais node)))))) 
+  (alfa-beta-eval node c l (+ 1 cc) ll counter3 (+ 1 counter4)))
+  (t (alfa-beta-eval node c l (+ 1 cc) ll counter3 counter4))
+ )
 )
 
 (defun troca-jogador (player)
@@ -218,6 +232,20 @@
   (t 1)
  )
 )
+
+(defun caixas-fechadas (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter 0))
+ (cond
+  ((and (equal cc c)(equal ll l)) counter)
+  ((eq c cc) (caixas-fechadas node c l 1 (+ 1 ll) counter))
+  ((eq 4 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao cc ll (get-arcos-verticais node))
+                                 (get-arco-na-posicao (+ 1 cc) ll (get-arcos-verticais node)))))) 
+  (caixas-fechadas node c l (+ 1 cc) ll (+ 1 counter)))
+  (t (caixas-fechadas node c l (+ 1 cc) ll counter))
+ )
+)
+
 
 (defun ordenar-sucessores (sucessores)
  (sort sucessores #'< :key #'third)
