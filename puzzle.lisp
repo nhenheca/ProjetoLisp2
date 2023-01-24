@@ -235,6 +235,7 @@
 
 (defun caixas-fechadas (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter 0))
  (cond
+  ((null node) 0)
   ((and (equal cc c)(equal ll l)) counter)
   ((eq c cc) (caixas-fechadas node c l 1 (+ 1 ll) counter))
   ((eq 4 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))

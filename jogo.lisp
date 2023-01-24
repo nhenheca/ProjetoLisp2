@@ -2,72 +2,93 @@
 
 ;;;################################ iNTERACAO hUMANO-cOMPUTADOR ##############################################################
 
-(defun jogada-humano (node pecaJ pecaC &optional (jp 0) (cp 0))
- (progn (imprimir-tabuleiro node)
- (cond 
-  ((tabuleiro-preenchidop node) nil)
-  (t (get-horizontal-vertical node pecaJ pecaC))
- ))
+(defun jogada-computador (node pecaJ pecaC jp cp)
+ (cond
+  ((> (caixas-fechadas node) (+ jp cp)) (jogada-humano node pecaJ pecaC (+ 1 jp) cp))
+  (t 
+   (cond 
+    ((tabuleiro-preenchidop node) nil)
+    (t (progn (alfa-beta pecaC node) (jogada-humano *jogada* pecaJ pecaC jp cp)))
+   )
+  )
+ )
 )
 
-(defun get-horizontal-vertical (node pecaJ pecaC)
+(defun jogada-humano (node pecaJ pecaC jp cp)
+ (cond
+  ((> (caixas-fechadas node) (+ jp cp)) (jogada-computador node pecaJ pecaC jp (+ 1 cp)))
+  (t 
+   (progn (imprimir-tabuleiro node)
+   (cond 
+    ((tabuleiro-preenchidop node) nil)
+    (t (get-horizontal-vertical node pecaJ pecaC jp cp))
+   ))
+  )
+ )
+)
+
+(defun get-horizontal-vertical (node pecaJ pecaC jp cp)
  (format t "Inserir peÃ§a na: ~%")
  (format t "1 - Horizontal~%")
  (format t "2 - Vertical~%")
  (let ((op (read)))
   (cond
-   ((eq 1 op) (inserir-arco-horizontal node pecaJ pecaC))
-   ((eq 2 op) (inserir-arco-vertical node pecaJ pecaC))
+   ((eq 1 op) (inserir-arco-horizontal node pecaJ pecaC jp cp))
+   ((eq 2 op) (inserir-arco-vertical node pecaJ pecaC jp cp))
    (t nil)
   )
  )
 )
 
-(defun inserir-arco-horizontal (node pecaJ pecaC)
+(defun inserir-arco-horizontal (node pecaJ pecaC jp cp)
  (format t "Digite a 'linha' e de seguida a 'coluna' pretendida. ~%")
  (let ((tabuleiro (arco-horizontal node (read) (read) (get-arcos-verticais node) pecaJ)))
   (cond
-   ((null tabuleiro) (jogada-humano node pecaJ pecaC))
+   ((null tabuleiro) (jogada-humano node pecaJ pecaC jp cp))
    (t (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))(format t "------------------------- ~%")(format t "------------------------- ~%")
-   (jogada-computador (list tabuleiro 0 (heuristica (list tabuleiro 0 0 0)) (no-pai node)) pecaJ pecaC)))
+   (jogada-computador (list tabuleiro 0 (heuristica (list tabuleiro 0 0 0)) (no-pai node)) pecaJ pecaC jp cp)))
   )
  )
 )
 
-(defun inserir-arco-vertical (node pecaJ pecaC)
+(defun inserir-arco-vertical (node pecaJ pecaC jp cp)
  (format t "Digite a 'coluna' e de seguida a 'linha' pretendida. ~%")
  (let ((tabuleiro (arco-vertical node (read) (read) (get-arcos-horizontais node) pecaJ)))
   (cond
-   ((null tabuleiro) (jogada-humano node pecaJ pecaC))
+   ((null tabuleiro) (jogada-humano node pecaJ pecaC jp cp))
    (t (progn (imprimir-tabuleiro (list tabuleiro 0 0 0))(format t "------------------------- ~%")(format t "------------------------- ~%")
-   (jogada-computador (list tabuleiro 0 (heuristica (list tabuleiro 0 0 0)) (no-pai node)) pecaJ pecaC)))
+   (jogada-computador (list tabuleiro 0 (heuristica (list tabuleiro 0 0 0)) (no-pai node)) pecaJ pecaC jp cp)))
   )
  )
 )
 
-(defun jogada-computador (node pecaJ pecaC)
- (cond 
-  ((tabuleiro-preenchidop node) nil)
-  (t (progn (alfa-beta pecaC node) (jogada-humano *jogada* pecaJ pecaC)))
- )
-)
 
 ;;;################################ iNTERACAO cOMPUTADOR-cOMPUTADOR ##############################################################
 
 (defun jogada-computador1 (node &optional (c1p 0) (c2p 0))
-(progn (imprimir-tabuleiro node)
- (cond 
-  ((tabuleiro-preenchidop node) nil)
-  (t (alfa-beta 1 node) (jogada-computador2 (list (car *jogada*) 0 (heuristica (list (car *jogada*) 0 0 0)) (no-pai (car *jogada*)))))
- ))
+ (cond
+  ((> (caixas-fechadas node) (+ c1p c2p)) (jogada-computador2 (list (car node) 0 (heuristica (list (car node) 0 0 0)) (no-pai node)) c1p (+ 1 c2p)))
+  (t 
+   (progn (imprimir-tabuleiro node)
+    (cond 
+     ((tabuleiro-preenchidop node) (list c1p c2p))
+     (t (progn (alfa-beta 1 node) (jogada-computador2 (list (car *jogada*) 0 (heuristica (list (car *jogada*) 0 0 0)) (no-pai *jogada*)) c1p c2p)))
+   ))
+  )
+ )
 )
 
 (defun jogada-computador2 (node &optional (c1p 0) (c2p 0))
-(progn (imprimir-tabuleiro node)
- (cond 
-  ((tabuleiro-preenchidop node) nil)
-  (t (alfa-beta 2 node) (jogada-computador1 (list (car *jogada*) 0 (heuristica (list (car *jogada*) 0 0 0)) (no-pai (car *jogada*)))))
- ))
+ (cond
+  ((> (caixas-fechadas node) (+ c1p c2p)) (jogada-computador1 (list (car node) 0 (heuristica (list (car node) 0 0 0)) (no-pai node)) (+ 1 c1p) c2p))
+  (t
+   (progn (imprimir-tabuleiro node)
+   (cond 
+    ((tabuleiro-preenchidop node) (list c1p c2p))
+    (t (progn (alfa-beta 2 node) (jogada-computador1 (list (car *jogada*) 0 (heuristica (list (car *jogada*) 0 0 0)) (no-pai *jogada*)) c1p c2p)))
+   ))
+  )
+ )
 )
 
 ;;;######################################################################################## MENUS
@@ -103,8 +124,8 @@
  (format t "|----------------------------------------------| ~%")
  (let ((op (read)))
   (cond
-   ((eq op 1) (jogada-humano (no-teste) 1 2))
-   ((eq op 2) (jogada-computador (no-teste) 2 1))
+   ((eq op 1) (jogada-humano (no-teste) 1 2 0 0))
+   ((eq op 2) (jogada-computador (no-teste) 2 1 0 0))
    (t (start1))
   )
  ))
@@ -112,7 +133,7 @@
 
 
 (defun start2 ()
- (jogada-computador1 (no-teste) 1 2)
+ (jogada-computador1 (no-teste))
 )
 
 ;############################################################################ ESCREVER TABULEIRO
