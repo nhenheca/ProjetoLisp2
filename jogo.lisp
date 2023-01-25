@@ -1,4 +1,5 @@
 (defvar *jogada* nil)
+(defvar *timelimit* nil)
 
 ;;;################################ iNTERACAO hUMANO-cOMPUTADOR ##############################################################
 
@@ -92,6 +93,19 @@
 )
 
 ;;;######################################################################################## MENUS
+(defun main
+  (progn 
+ (format t "|----------------------------------------------| ~%")
+ (format t "|                                              | ~%")
+ (format t "|    Defina o tempo limite para o computador   | ~%")     
+ (format t "|                                              | ~%")
+ (format t "|                Entre 1 - 20                  | ~%")
+ (format t "|                                              | ~%")
+ (format t "|----------------------------------------------| ~%")
+ (let ((op (read)))
+  (progn (setf *timelimit* op)(start))
+ ))
+)
 
 (defun start ()
  (progn 
