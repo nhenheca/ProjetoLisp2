@@ -7,7 +7,7 @@
   ((> (caixas-fechadas node) (+ jp cp)) (jogada-humano node pecaJ pecaC (+ 1 jp) cp))
   (t 
    (cond 
-    ((tabuleiro-preenchidop node) nil)
+    ((tabuleiro-preenchidop node) (list jp cp))
     (t (progn (alfa-beta pecaC node) (jogada-humano *jogada* pecaJ pecaC jp cp)))
    )
   )
@@ -20,7 +20,7 @@
   (t 
    (progn (imprimir-tabuleiro node)
    (cond 
-    ((tabuleiro-preenchidop node) nil)
+    ((tabuleiro-preenchidop node) (list jp cp))
     (t (get-horizontal-vertical node pecaJ pecaC jp cp))
    ))
   )
