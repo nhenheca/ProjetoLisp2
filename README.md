@@ -500,11 +500,23 @@ Neste menu deverá escolher qual será o primeiro jogador a colocar uma aresta.
 # Output
 
 ## CONSOLE OUTPUT
-```
 O resultado é mostrado como:
-(16 14)
-16 Pontos para o Jogador 1, 14 Pontos para o Jogador 2
+
 ```
+.___.___.___.___.___.___.
+|   |   |   |   |   |   |
+.___.___.___.___.___.___.
+|   |   |   |   |   |   |
+.___.___.___.___.___.___.
+|   |   |   |   |   |   |
+.___.___.___.___.___.___.
+|   |   |   |   |   |   |
+.___.___.___.___.___.___.
+|   |   |   |   |   |   |
+.___.___.___.___.___.___.
+(15 15)
+```
+15 Pontos para o Jogador 1, 15 Pontos para o Jogador 2
 
 
 ## FILE OUTPUT
