@@ -203,11 +203,6 @@
  )
 )
 
-;;;GET PROFUNDIDADE
-(defun get-d ()
- 5
-)
-
 (defun alfa-beta-eval (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter3 0) (counter4 0))
  (cond
   ((and (equal cc c)(equal ll l)) (+ (- (* 10 counter4) (* 10 (caixas-fechadas (no-pai node)))) (* -10 counter3)))

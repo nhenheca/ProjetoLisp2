@@ -1,18 +1,20 @@
 ;;;############# ESTATISTICAS PARA ESCREVER O FICHEIRO
 
-(let ((jogada nil)(timelimit nil)(nosanalisados 0)(ncortesa 0)(ncortesb 0)(spendtime 0))
+(let ((jogada nil)(timelimit nil)(nosanalisados 0)(ncortesa 0)(ncortesb 0)(spendtime 0)(maxdepth nil))
  (defun setJogada (x)(setf jogada x))
  (defun setTimelimit (x)(setf timelimit x))
  (defun setnosanalisados (x)(setf nosanalisados x))
  (defun setncortesa (x)(setf ncortesa x))
  (defun setncortesb (x)(setf ncortesb x))
  (defun setspendtime (x)(setf spendtime x))
+ (defun setmaxdepth (x)(setf maxdepth x))
  (defun jogada () jogada)
  (defun timelimit () timelimit)
  (defun nosanalisados () nosanalisados)
  (defun ncortesa () ncortesa)
  (defun ncortesb () ncortesb)
  (defun spendtime () spendtime)
+ (defun maxdepth () maxdepth)
 )
 
 (defun clearstatus () (setnosanalisados 0)(setncortesa 0)(setncortesb 0)(setspendtime 0))
@@ -109,6 +111,20 @@
 )
 
 ;;;######################################################################################## MENUS
+(defun menu ()
+  (progn 
+ (format t "|----------------------------------------------| ~%")
+ (format t "|                                              | ~%")
+ (format t "|         Defina a profundidade máxima         | ~%")     
+ (format t "|                                              | ~%")
+ (format t "|                Entre 2 - 10                  | ~%")
+ (format t "|                                              | ~%")
+ (format t "|----------------------------------------------| ~%")
+ (let ((op (read)))
+  (progn (setmaxdepth op)(main))
+ ))
+)
+
 (defun main ()
   (progn 
  (format t "|----------------------------------------------| ~%")

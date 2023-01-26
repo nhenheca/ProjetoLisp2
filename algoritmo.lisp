@@ -6,7 +6,7 @@
 (defun alfa-beta (player &optional (node (no-teste)) (alfa (- 0 999)) (beta 999) (starttime (get-universal-time)))
  (cond
   ((> (- (get-universal-time) starttime) (timelimit)) (progn (setspendtime (- (get-universal-time) starttime)) (alfa-beta-eval node)))
-  ((or (null (sucessores node (operadores) player)) (eq (no-profundidade node) (get-d))) (progn (setspendtime (- (get-universal-time) starttime)) (alfa-beta-eval node)))
+  ((or (null (sucessores node (operadores) player)) (eq (no-profundidade node) (maxdepth))) (progn (setspendtime (- (get-universal-time) starttime)) (alfa-beta-eval node)))
   (t
    (cond
     ((evenp (no-profundidade node)) (alfa-beta-max player (ordenar-sucessores (sucessores node (operadores) player)) alfa beta starttime))
