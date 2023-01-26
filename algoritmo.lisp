@@ -5,8 +5,8 @@
 
 (defun alfa-beta (player &optional (node (no-teste)) (alfa (- 0 999)) (beta 999) (starttime (get-universal-time)))
  (cond
-  ((> (- (get-universal-time) starttime) *timelimit*) (alfa-beta-eval node))
-  ((or (null (sucessores node (operadores) player)) (eq (no-profundidade node) (get-d))) (alfa-beta-eval node))
+  ((> (- (get-universal-time) starttime) (timelimit)) (progn (setspendtime (- (get-universal-time) starttime)) (alfa-beta-eval node)))
+  ((or (null (sucessores node (operadores) player)) (eq (no-profundidade node) (get-d))) (progn (setspendtime (- (get-universal-time) starttime)) (alfa-beta-eval node)))
   (t
    (cond
     ((evenp (no-profundidade node)) (alfa-beta-max player (ordenar-sucessores (sucessores node (operadores) player)) alfa beta starttime))
@@ -20,16 +20,16 @@
   (cond 
    ((null sucessores) alfa)
    (t (let* ((valor (alfa-beta player (car sucessores) alfa beta starttime))(novo-alfa (max alfa valor)))
-        (if (>= novo-alfa beta)(progn beta)
-        (progn (setf *jogada* (car sucessores)) 
+        (if (>= novo-alfa beta)(progn (setncortesa (+ (ncortesa) 1))  beta)
+        (progn (setJogada (car sucessores))(setnosanalisados (+ (nosanalisados) 1)) 
             (max novo-alfa (alfa-beta-max player (cdr sucessores) novo-alfa beta starttime))))))))
 
 (defun alfa-beta-min (player sucessores alfa beta starttime)
   (cond 
    ((null sucessores) beta)
    (t (let* ((valor (alfa-beta player (car sucessores) alfa beta starttime))(novo-beta (min beta valor)))
-        (if (<= novo-beta alfa)(progn alfa)
-        (progn (setf *jogada* (car sucessores)) 
+        (if (<= novo-beta alfa)(progn (setncortesb (+ (ncortesb) 1)) alfa)
+        (progn (setJogada (car sucessores))(setnosanalisados (+ (nosanalisados) 1)) 
             (min novo-beta (alfa-beta-min player (cdr sucessores) alfa novo-beta starttime))))))))
 
 ;;;############################################################################################################################ TENTATIVA

@@ -1,5 +1,21 @@
-(defvar *jogada* nil)
-(defvar *timelimit* nil)
+;;;############# ESTATISTICAS PARA ESCREVER O FICHEIRO
+
+(let ((jogada nil)(timelimit nil)(nosanalisados 0)(ncortesa 0)(ncortesb 0)(spendtime 0))
+ (defun setJogada (x)(setf jogada x))
+ (defun setTimelimit (x)(setf timelimit x))
+ (defun setnosanalisados (x)(setf nosanalisados x))
+ (defun setncortesa (x)(setf ncortesa x))
+ (defun setncortesb (x)(setf ncortesb x))
+ (defun setspendtime (x)(setf spendtime x))
+ (defun jogada () jogada)
+ (defun timelimit () timelimit)
+ (defun nosanalisados () nosanalisados)
+ (defun ncortesa () ncortesa)
+ (defun ncortesb () ncortesb)
+ (defun spendtime () spendtime)
+)
+
+(defun clearstatus () (setnosanalisados 0)(setncortesa 0)(setncortesb 0)(setspendtime 0))
 
 ;;;################################ iNTERACAO hUMANO-cOMPUTADOR ##############################################################
 
@@ -9,7 +25,7 @@
   (t 
    (cond 
     ((tabuleiro-preenchidop node) (list jp cp))
-    (t (progn (alfa-beta pecaC node) (jogada-humano *jogada* pecaJ pecaC jp cp)))
+    (t (progn (alfa-beta pecaC node) (writelog 'Computador) (clearstatus) (jogada-humano (jogada) pecaJ pecaC jp cp)))
    )
   )
  )
@@ -73,7 +89,7 @@
    (progn (imprimir-tabuleiro node)
     (cond 
      ((tabuleiro-preenchidop node) (list c1p c2p))
-     (t (progn (alfa-beta 1 node) (jogada-computador2 (list (car *jogada*) 0 (heuristica (list (car *jogada*) 0 0 0)) (no-pai *jogada*)) c1p c2p)))
+     (t (progn (alfa-beta 1 node) (writelog 'Jogador1) (clearstatus) (jogada-computador2 (list (car (jogada)) 0 (heuristica (list (car (jogada)) 0 0 0)) (no-pai (jogada))) c1p c2p)))
    ))
   )
  )
@@ -86,7 +102,7 @@
    (progn (imprimir-tabuleiro node)
    (cond 
     ((tabuleiro-preenchidop node) (list c1p c2p))
-    (t (progn (alfa-beta 2 node) (jogada-computador1 (list (car *jogada*) 0 (heuristica (list (car *jogada*) 0 0 0)) (no-pai *jogada*)) c1p c2p)))
+    (t (progn (alfa-beta 2 node) (writelog 'Jogador2) (clearstatus) (jogada-computador1 (list (car (jogada)) 0 (heuristica (list (car (jogada)) 0 0 0)) (no-pai (jogada))) c1p c2p)))
    ))
   )
  )
@@ -103,7 +119,7 @@
  (format t "|                                              | ~%")
  (format t "|----------------------------------------------| ~%")
  (let ((op (read)))
-  (progn (setf *timelimit* op)(start))
+  (progn (setTimelimit op)(start))
  ))
 )
 
@@ -175,4 +191,14 @@
   ((eq (car lista) 0) (progn (format t "    ") (imprimir-linha-coluna-op2 (cdr lista))))
   ((not (eq (car lista) 0)) (progn (format t "|   ") (imprimir-linha-coluna-op2 (cdr lista))))
  )
+)
+
+;######################################################################################################### ESCREVER PARA FICHEIRO LOG.DAT
+
+(defun writelog (player)
+ (with-open-file (str "log.dat"
+                     :direction :output
+                     :if-exists :append
+                     :if-does-not-exist :create)
+(format str "~a ~a ~%" player (list (car (jogada)) (nosanalisados) (ncortesa) (ncortesb) (spendtime) )))
 )
