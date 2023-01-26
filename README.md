@@ -147,6 +147,7 @@ A Sucessão de um determinado nó, é um conjunto de movimentos permitidos apara
 
 # Algoritmos e sua implementação
 
+### AlfaBeta
 Nesta segunda parte do projeto foi implementado apenas um algoritmo, sendo este o AlfaBeta FailHard.
 
 ```lisp
@@ -179,7 +180,32 @@ Nesta segunda parte do projeto foi implementado apenas um algoritmo, sendo este 
         (progn (setJogada (car sucessores))(setnosanalisados (+ (nosanalisados) 1)) 
             (min novo-beta (alfa-beta-min player (cdr sucessores) alfa novo-beta starttime))))))))
 ```
+## Função de avaliação AlfaBeta
 
+<p> A função de avaliação alfa-beta verifica o numero de caixas no tabuleiro com 3 arestas e o numero de caixas no tabuleiro com 4 arestas.</p>
+<p>Cada caixa com 4 arestas vale +10 e cada caixa com 3 arestas vale -10.</p>
+<p>Isto significa se na sua jogada colocar uma terceira aresta numa caixa é mau pois oferece uma caixa por fechar ao oponente mas se colocar uma quarta aresta numa caixa significa que a fechou, isto é, ganhou 1 ponto.</p>
+<p>A funcão devolve o somatorio de ocorrencias caixas 3 vezes -10 menos o somatorio de ocorrencias caixas 4 vezes 10.</p>
+
+```lisp
+(defun alfa-beta-eval (node &optional (c 7) (l 5) (cc 1) (ll 1) (counter3 0) (counter4 0))
+ (cond
+  ((and (equal cc c)(equal ll l)) (+ (- (* 10 counter4) (* 10 (caixas-fechadas (no-pai node)))) (* -10 counter3)))
+  ((eq c cc) (alfa-beta-eval node c l 1 (+ 1 ll) counter3 counter4))
+  ((eq 3 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao cc ll (get-arcos-verticais node))
+                                 (get-arco-na-posicao (+ 1 cc) ll (get-arcos-verticais node)))))) 
+  (alfa-beta-eval node c l (+ 1 cc) ll (+ 1 counter3) counter4))
+  ((eq 4 (length (remove 0 (list (get-arco-na-posicao ll cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao (+ 1 ll) cc (get-arcos-horizontais node))
+                                 (get-arco-na-posicao cc ll (get-arcos-verticais node))
+                                 (get-arco-na-posicao (+ 1 cc) ll (get-arcos-verticais node)))))) 
+  (alfa-beta-eval node c l (+ 1 cc) ll counter3 (+ 1 counter4)))
+  (t (alfa-beta-eval node c l (+ 1 cc) ll counter3 counter4))
+ )
+)
+```
 
 ## Ordenação dos nós
 Foi implementada uma função de ordenação dos nós sucessores com o objetivo de melhorar o número de cortes realizados por o algoritmo AlfaBeta. Para esse efeito foi aplicada uma heurística de avaliação.
@@ -210,7 +236,7 @@ O símbolo 'third' retorna o valor da heurística do nó.
 ```
 Esta é a heurística implementada para a ordenação dos nós.
 
-# Limitações técnicas e ideias para desenvolvimento futuro
+## Limitações técnicas e ideias para desenvolvimento futuro
 
 
 Ao longo do desenvolvimento do projeto, tivemos muitas dificuldades em implementar o algoritimo AlfaBeta. Devido a necessitarmos de saber qual a peça de cada jogador iria utilizar, não nos foi possível implementar o AlfaBeta puro, ou seja, sem nenhum input adicional. 
@@ -219,6 +245,10 @@ Ao longo do desenvolvimento do projeto, tivemos muitas dificuldades em implement
 
 ## AlfaBeta
 *(Usando heuristica criada)*
+
+## Análise contra Cpu-Cpu
+
+###Problema 1
 
 Para este problema foi utilizado uma profundidade máxima de 4 com um limite de tempo de 20 segundos.
 ```lisp
@@ -259,26 +289,109 @@ Neste problema o AlfaBeta foi capaz de analisar a árvore completa.
 
 ## Análise contra Humano
 
+### Problema 2
 
+Para este problema foi utilizado uma profundidade máxima de 3 com um limite de tempo de 20 segundos.
 
-| Problema         | Nós Gerados   | Nós Expandidos | *g(x)*   Profundidade  |Penetrância|Execução em segundos
-| --------- | :-------:|:--------:|:-------:| :---------:| :---------:| 
-| A |   77  |  4    |  2    | 5/77      |0 
-| B |   16   |  0   |   1   | 1/16        |0 
-| C |   Memory Bound   |  Memory Bound    |  Memory Bound    | Memory Bound          |Memory Bound
-| D |   Memory Bound   |  Memory Bound    |  Memory Bound    | Memory Bound          |Memory Bound
-| E |   Memory Bound   |  Memory Bound    |  Memory Bound    | Memory Bound          |Memory Bound
+```lisp
+Jogada Humana (H - 1 1)
+.___.   .   .   .   .   .
 
+.   .   .   .   .   .   .
 
+.   .   .   .   .   .   .
 
+.   .   .   .   .   .   .
 
+.   .   .   .   .   .   .
 
+.   .   .   .   .   .   .
+```
+```lisp
+Jogada CPU
+.___.   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+```
+```lisp
+Jogada Humana (H - 2 1)
+.___.   .   .   .   .   .
+
+.___.   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+```
+```lisp
+Jogada CPU
+.___.   .   .   .   .   .
+
+.___.   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+```
+```lisp
+Jogada Humana (V - 1 1)
+.___.   .   .   .   .   .
+|
+.___.   .   .   .   .   .
+
+.   .   .   .   .   .   .
+
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+```
+```lisp
+Jogada CPU (Fechou uma caixa e colocou mais uma aresta)
+.___.   .   .   .   .   .
+|   |
+.___.   .   .   .   .   .
+
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+                        |
+.   .   .   .   .   .   .
+```
+
+| Jogadas  | Nós Analisados | Cortes Alfa | Cortes Beta | Execução em segundos | Caixa Fechada |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 1 |   5322  |  71    |  69    | 3      | ❌
+| 2 |   22841  |  208    |  67    | 10      | ❌
+| 3 |   50233  |  758    |  14    | 20      | ✔️
+| 4 |   151  |  64    |  0    | 0      | ❌
+
+<p>Podemos analisar que o computador demora bastante tempo e analisa varios nós com o objetivo de fechar uma caixa. Após fechar a caixa ele coloca a próxima aresta instataneamente.</p>
 
 <br>
 <br>
 <br>
 
-# Projeto Nº1: Época Normal 
+# Projeto Nº2: Época Normal 
 
 
 ## Inteligência Artificial 22/23
@@ -305,7 +418,6 @@ Gabriel Garcia - 202002361
 
 1. Introdução
 2. Instalação
-3. Configuração
 4. Interface da Aplicação
 5. Output
 
@@ -324,120 +436,435 @@ Lispworks é uma Integrated cross-platform development tool for Common Lisp  [aq
 
 A estrutura do projeto está organizada em 5 ficheiros:
 
-- projeto.lisp - Interação com o utilizador, escrita e leitura de ficheiros.
+- jogo.lisp - Interação com o utilizador, escrita e leitura de ficheiros.
 - puzzle.lisp - Implementação da resolução do problema incluindo seletores, operadores heuristicas e outras funcõess auxiliares.
-- procura.lisp - Implementação dos algoritmos de procura BFS, DFS e A*.
-- problemas.dat - Tabuleiros representantes do problema.
-- solucao.txt - A solução ao problema dado mais os seus dados estatisticos.
-
-
-# Configuração
-
-É necessario alterar a diretoria do projeto nas seguintes funções contidas em projeto.lisp:
-
-```Lisp
-(defun get-number-of-lines ()
- (with-open-file (stream "C:/Users/nhenhecas/Documents/GitHub/ProjetoLisp/problem.dat" :direction :input) 
-  (get-number-of-lines-aux stream) 
- )
-)
-
-(defun my-get-tab (i)
- (with-open-file (stream "C:/Users/nhenhecas/Documents/GitHub/ProjetoLisp/problem.dat" :direction :input) 
-  (tab stream i) 
- )
-)
-
-(defun write-to-file (params)
- (with-open-file (str "C:/Users/nhenhecas/Documents/GitHub/ProjetoLisp/solucao.txt" :direction :output :if-exists :supersede :if-does-not-exist :create)
-  (format str "~a" params))
-)
-```
-
-Após as funções alteradas deverá abrir os ficheiros puzzle.lisp, projeto.lisp, procura.lisp e compilar cada um deles.
-
+- algoritmo.lisp - Implementação do algoritmo AlfaBeta FailHard.
+- log.dat - Ficheiro com os resultados do jogo.
 
 # Interface da Aplicação
 
-## Escolher tabuleiro
+## Escolher profundidade
 
-No menu princial terá a hipotese de escolher um dos tabuleiros contidos em problema.dat
+No menu princial terá a hipotese de a profundidade máxima do AlfaBeta.
 ```
-|-------------------------|
-|                         |
-|   ESCOLHA O TABULEIRO   |
-|                         |
-|    6 - Tabuleiro 6      |
-|    5 - Tabuleiro 5      |
-|    4 - Tabuleiro 4      |
-|    3 - Tabuleiro 3      |
-|    2 - Tabuleiro 2      |
-|    1 - Tabuleiro 1      |
-|                         |
-|-------------------------|
-Digite o numero do tabuleiro indicados:
-```
-## Escolher algoritmo 
-Neste menu terá a hipotese de escolher o algotitmo a aplicar a um dos tabuleiros contidos em problema.dat escolhido anteriormente.
-
-```
-|-------------------------|
-|                         |
-|   ESCOLHA O ALGORITMO   |
-|                         |
-|       1 - BFS           |
-|       2 - DLS           |
-|       3 - A*            |
-|                         |
-|       0 - Voltar        |
-|                         |
-|-------------------------|
-Digite o algoritmo do tabuleiro indicados: 
+|----------------------------------------------|
+|                                              |
+|         Defina a profundidade máxima         |
+|                                              |
+|                Entre 2 - 10                  |
+|                                              |
+|----------------------------------------------|
 ```
 
-### Escolher algoritmo DLS
+## Escolher tempo limite
 
+Neste menu deverá escolher o tempo maximo que o CPU tem pra efetuar a sua jogada.
 ```
-|-------------------------|
-|                         |
-|   ESCOLHA O ALGORITMO   |
-|                         |
-|       1 - BFS           |
-|       2 - DLS           |
-|       3 - A*            |
-|                         |
-|       0 - Voltar        |
-|                         |
-|-------------------------|
-Digite o algoritmo do tabuleiro indicados: 2
+|----------------------------------------------| 
+|                                              |
+|    Defina o tempo limite para o computador   |
+|                                              |
+|                Entre 1 - 20                  |
+|                                              |
+|----------------------------------------------|
+```
 
-Digite a profundidade:
+## Escolher modo de Jogo
+
+Neste menu deverá escolher o modo de jogo.
 ```
-## Escolher heuristica
-Neste menu terá a hipotese de escolher a heuristica a aplicar a um dos tabuleiros contidos em problema.dat escolhido anteriormente.
+|----------------------------------------------| 
+|                                              |
+|          Selecione o modo de Jogo            |
+|                                              |
+|           1 - Humano-Computador              |
+|         2 - Computador-Computador            |
+|                                              |
+|----------------------------------------------|
 ```
-|-------------------------|
-|                         |
-|  ESCOLHA A HEURISTICA   |
-|                         |
-|       1 - DADA          |
-|       2 - GRUPO         |
-|                         |
-|       0 - Voltar        |
-|                         |
-|-------------------------|
-Digite a heuristica desejada:
+
+## Modo de Jogo Humano-Computador
+
+Neste menu deverá escolher qual será o primeiro jogador a colocar uma aresta.
 ```
+|----------------------------------------------| 
+|                                              |
+|        Selecione o primeiro Jogador          |
+|                                              |
+|                 1 - Humano                   |
+|               2 - Computador                 |
+|                                              |
+|----------------------------------------------|
+```
+
 # Output
 
 ## CONSOLE OUTPUT
-O output da consela é nil, informa que o algoritmo correu com sucesso até ao nó objetivo. 
+```
+O resultado é mostrado como:
+(16 14)
+16 Pontos para o Jogador 1, 14 Pontos para o Jogador 2
+```
 
 
 ## FILE OUTPUT
- O output do ficheiro será uma lista constituida pelo caminhio até ao nó objetivo, profundidade, numero total de nós gerados, numero de nós expandidos, penetração e tempo de execução.
+ O output do ficheiro será uma lista constituida pelo nó estado, nós analisados, nnumero de cortes alfa, numero de cortes beta e tempo de execução.
 
-Exemplo problema E executado pelo A* com a heuristica criada. 
+Exemplo problema de ouput CPU-CPU
 ```
-(((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 1 1 1 0 0) (0 1 1 1 1 1))) 24 23 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 0 1 1 0 0) (0 1 1 1 1 1))) 23 25 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 22 27 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 21 29 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 20 31 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 19 33 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 18 35 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 17 37 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 16 39 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 15 41 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 14 43 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 13 45 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 1 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 12 47 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 11 49 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (1 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 10 51 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 9 53 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 1 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 8 55 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (1 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 7 57 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 1 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 6 59 ((((0 0 0 1 0 0) (1 1 1 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 0 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 5 61 ((((0 0 0 1 0 0) (1 1 0 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 1 0 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 4 63 ((((0 0 0 1 0 0) (1 1 0 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 0 0 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 3 65 ((((0 0 0 1 0 0) (1 0 0 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 0 0 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 2 67 ((((0 0 0 1 0 0) (0 0 0 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (1 1 0 0 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 1 69 ((((0 0 0 1 0 0) (0 0 0 1 1 1) (1 1 1 1 1 0) (0 0 0 1 1 0) (0 0 0 1 1 0) (0 0 1 1 1 1) (0 0 1 1 1 1)) ((0 0 0 1 1 1) (0 1 0 0 1 1) (0 1 1 0 1 1) (0 0 1 1 0 0) (1 0 1 0 1 0) (0 0 1 1 0 0) (0 1 1 1 1 1))) 0 71 NIL))))))))))))))))))))))))) 690 24 24/691 0)
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 0 0) (0 0 0 0 1)))
+          141 0 70 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 0 0) (0 0 0 2 1)))
+          139 0 69 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 0 0) (0 0 1 2 1)))
+          137 0 68 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 0 0) (0 2 1 2 1)))
+          135 0 67 1) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 0 0) (1 2 1 2 1)))
+          133 0 66 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 0 2) (1 2 1 2 1)))
+          131 0 65 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 0 1 2) (1 2 1 2 1)))
+          193 0 63 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 0 2 1 2) (1 2 1 2 1)))
+          127 0 63 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (0 1 2 1 2) (1 2 1 2 1)))
+          187 0 61 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          245 0 59 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          241 0 58 1) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          237 0 57 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          233 0 56 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          229 0 55 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          225 0 54 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          221 0 53 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 0 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          217 0 52 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 0 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          213 0 51 1) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (0 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          209 0 50 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 0) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          205 0 49 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 0 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          201 0 48 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 0 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          197 0 47 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 0 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          193 0 46 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (0 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          189 0 45 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 0) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          185 0 44 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 0 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          181 0 43 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 0 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          177 0 42 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 0 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          173 0 41 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (0 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          169 0 40 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 0) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          165 0 39 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 0 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          161 0 38 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 0 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          157 0 37 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 0 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          153 0 36 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((0 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          149 0 35 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 0))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          145 0 34 0) 
+JOGADOR2 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 0) (0 0 0 0 0 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          106 0 34 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0)
+            (0 0 0 0 0 1) (0 0 0 0 0 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          137 0 32 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 1)
+            (0 0 0 0 0 1) (0 0 0 0 0 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          133 0 31 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 0) (0 0 0 0 0 1) (0 0 0 0 0 1)
+            (0 0 0 0 0 1) (0 0 0 0 0 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          129 0 30 0) 
+JOGADOR1 ((((0 0 0 0 0 0) (0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1)
+            (0 0 0 0 0 1) (0 0 0 0 0 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          125 0 29 0) 
+JOGADOR1 ((((0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1)
+            (0 0 0 0 0 1) (0 0 0 0 0 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          121 0 28 0) 
+JOGADOR1 ((((0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1)
+            (0 0 0 0 0 1) (0 0 0 0 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          88 0 28 0) 
+JOGADOR2 ((((0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1)
+            (0 0 0 0 2 1) (0 0 0 0 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          113 0 26 0) 
+JOGADOR2 ((((0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 2 1)
+            (0 0 0 0 2 1) (0 0 0 0 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          109 0 25 0) 
+JOGADOR2 ((((0 0 0 0 0 1) (0 0 0 0 0 1) (0 0 0 0 2 1) (0 0 0 0 2 1)
+            (0 0 0 0 2 1) (0 0 0 0 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          105 0 24 0) 
+JOGADOR2 ((((0 0 0 0 0 1) (0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1)
+            (0 0 0 0 2 1) (0 0 0 0 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          101 0 23 0) 
+JOGADOR2 ((((0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1)
+            (0 0 0 0 2 1) (0 0 0 0 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          97 0 22 0) 
+JOGADOR2 ((((0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1)
+            (0 0 0 0 2 1) (0 0 0 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          70 0 22 0) 
+JOGADOR1 ((((0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1)
+            (0 0 0 1 2 1) (0 0 0 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          89 0 20 0) 
+JOGADOR1 ((((0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 1 2 1)
+            (0 0 0 1 2 1) (0 0 0 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          85 0 19 0) 
+JOGADOR1 ((((0 0 0 0 2 1) (0 0 0 0 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1)
+            (0 0 0 1 2 1) (0 0 0 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          81 0 18 0) 
+JOGADOR1 ((((0 0 0 0 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1)
+            (0 0 0 1 2 1) (0 0 0 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          77 0 17 0) 
+JOGADOR1 ((((0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1)
+            (0 0 0 1 2 1) (0 0 0 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          73 0 16 0) 
+JOGADOR1 ((((0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1)
+            (0 0 0 1 2 1) (0 0 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          52 0 16 0) 
+JOGADOR2 ((((0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1)
+            (0 0 2 1 2 1) (0 0 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          65 0 14 0) 
+JOGADOR2 ((((0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 2 1 2 1)
+            (0 0 2 1 2 1) (0 0 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          61 0 13 0) 
+JOGADOR2 ((((0 0 0 1 2 1) (0 0 0 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1)
+            (0 0 2 1 2 1) (0 0 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          57 0 12 0) 
+JOGADOR2 ((((0 0 0 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1)
+            (0 0 2 1 2 1) (0 0 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          53 0 11 0) 
+JOGADOR2 ((((0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1)
+            (0 0 2 1 2 1) (0 0 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          49 0 10 0) 
+JOGADOR2 ((((0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1)
+            (0 0 2 1 2 1) (0 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          34 0 10 0) 
+JOGADOR1 ((((0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1)
+            (0 1 2 1 2 1) (0 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          41 0 8 0) 
+JOGADOR1 ((((0 0 2 1 2 1) (0 0 2 1 2 1) (0 0 2 1 2 1) (0 1 2 1 2 1)
+            (0 1 2 1 2 1) (0 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          37 0 7 0) 
+JOGADOR1 ((((0 0 2 1 2 1) (0 0 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1)
+            (0 1 2 1 2 1) (0 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          33 0 6 0) 
+JOGADOR1 ((((0 0 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1)
+            (0 1 2 1 2 1) (0 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          29 0 5 0) 
+JOGADOR1 ((((0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1)
+            (0 1 2 1 2 1) (0 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          25 0 4 0) 
+JOGADOR1 ((((0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1)
+            (0 1 2 1 2 1) (1 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          16 0 4 0) 
+JOGADOR2 ((((0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1)
+            (2 1 2 1 2 1) (1 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          17 0 2 0) 
+JOGADOR2 ((((0 1 2 1 2 1) (0 1 2 1 2 1) (0 1 2 1 2 1) (2 1 2 1 2 1)
+            (2 1 2 1 2 1) (1 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          7 0 3 0) 
+JOGADOR2 ((((0 1 2 1 2 1) (0 1 2 1 2 1) (2 1 2 1 2 1) (2 1 2 1 2 1)
+            (2 1 2 1 2 1) (1 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          5 0 2 0) 
+JOGADOR2 ((((0 1 2 1 2 1) (2 1 2 1 2 1) (2 1 2 1 2 1) (2 1 2 1 2 1)
+            (2 1 2 1 2 1) (1 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          3 0 1 0) 
+JOGADOR2 ((((2 1 2 1 2 1) (2 1 2 1 2 1) (2 1 2 1 2 1) (2 1 2 1 2 1)
+            (2 1 2 1 2 1) (1 2 1 2 1 2))
+           ((1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1) (2 1 2 1 2) (1 2 1 2 1)
+            (2 1 2 1 2) (1 2 1 2 1)))
+          1 0 0 0) 
 ```
