@@ -218,3 +218,10 @@
                      :if-does-not-exist :create)
 (format str "~a ~a ~%" player (list (car (jogada)) (nosanalisados) (ncortesa) (ncortesb) (spendtime) )))
 )
+
+;############################################## Torneio
+
+(defun jogar (estado tempo)
+ (progn (setTimelimit (/ tempo 1000))(alfa-beta 1 (list estado 0 0)))
+ (list (car (jogada)))
+)
