@@ -1,3 +1,4 @@
+(defpackage :202001391-202000432-202002361 (:use :cl))
 ;;;MIGUEL GABRIEL MARQUES ########################################################
 
 ;;;Retorna um tabuleiro 3x3 (3 arcos na vertical por 3 arcos na horizontal) Profundidade Heuristica Pai"

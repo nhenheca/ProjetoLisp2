@@ -1,3 +1,4 @@
+(defpackage :202001391-202000432-202002361 (:use :cl))
 ;;;############# ESTATISTICAS PARA ESCREVER O FICHEIRO
 
 (let ((jogada nil)(timelimit nil)(nosanalisados 0)(ncortesa 0)(ncortesb 0)(spendtime 0)(maxdepth nil))
